@@ -1,0 +1,43 @@
+{
+    "coord": {
+        "lon": 55.0988,
+        "lat": 51.7727
+    },
+    "weather": [
+        {
+            "id": 601,
+            "main": "Snow",
+            "description": "snow",
+            "icon": "13n"
+        }
+    ],
+    "base": "stations",
+    "main": {
+        "temp": 264.15,
+        "feels_like": 256,
+        "temp_min": 264.15,
+        "temp_max": 264.15,
+        "pressure": 1018,
+        "humidity": 73
+    },
+    "visibility": 10000,
+    "wind": {
+        "speed": 7,
+        "deg": 230
+    },
+    "clouds": {
+        "all": 75
+    },
+    "dt": 1613320828,
+    "sys": {
+        "type": 1,
+        "id": 9044,
+        "country": "RU",
+        "sunrise": 1613273780,
+        "sunset": 1613309488
+    },
+    "timezone": 18000,
+    "id": 515003,
+    "name": "Orenburg",
+    "cod": 200
+}

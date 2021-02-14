@@ -22,8 +22,8 @@ type currentWeather struct {
 func readEnvVars() []string {
 	var result []string
 	city := os.Getenv("CITY")
-	port := os.Getenv("PORT")
 	token := os.Getenv("TOKEN")
+	unit := os.Getenv("WEATHER_UNIT")
 	if token == "" {
 		log.Fatal("Token has not been recoginzed, exit...")
 	}
@@ -32,10 +32,11 @@ func readEnvVars() []string {
 		city = "orenburg"
 	}
 	result = append(result, city)
-	if port == "" {
-		port = "8080"
+	if unit == "" {
+		unit = "metric"
 	}
-	result = append(result, port)
+	result = append(result, unit)
+
 	return result
 }
 
@@ -51,6 +52,14 @@ func httpGetWeather(url string) []byte {
 		log.Fatalf("The error occurs with reading JSON: %v", err)
 	}
 	return body
+}
+
+func fileGetWeather (fileDescriptor string) []byte {
+	jsonData, err := ioutil.ReadFile(fileDescriptor)
+	if err != nil {
+		log.Fatalf("The file %s cannot be opened, exit...", fileDescriptor)
+	}
+	return jsonData
 }
 
 func readJSON (body []byte) currentWeather {
