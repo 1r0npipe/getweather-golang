@@ -2,39 +2,58 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 )
 
-var city = "orenburg"
-var port = "8080"
-var token = "38c3a66510637c67309b55afc428f4dc"
-var url = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + token
-
-type simpleWeather struct {
-		Temp      float64 `json:"temp"`
-		FeelsLike float64 `json:"feels_like"`
-		Pressure  int     `json:"pressure"`
-		Humidity  int     `json:"humidity"`
+type СurrentWeather struct {
+	Temp      float64 `json:"temp"`
+	FeelsLike float64 `json:"feels_like"`
+	Pressure  int     `json:"pressure"`
+	Humidity  int     `json:"humidity"`
 }
 
-func main()  {
-
-	http.HandleFunc("/", simpleWebJSON)
-
-    http.ListenAndServe(":" + port, nil)
+func readEnvVars() []string {
+	var result []string
+	city := os.Getenv("CITY")
+	port := os.Getenv("PORT")
+	token := os.Getenv("TOKEN")
+	if token == "" {
+		log.Fatal("Token has not been recoginzed, exit...")
+	}
+	result = append(result, token)
+	if city == "" {
+		city = "orenburg"
+	}
+	result = append(result, city)
+	if port == "" {
+		port = "8080"
+	}
+	result = append(result, port)
+	return result
 }
 
-func simpleWebJSON(w http.ResponseWriter, r *http.Request) {
-    fmt.Fprintf(w, "Hello, %s!", r.URL.Path[1:])
-}
 
-func httpGetWeather (url string, target interface{}) error {
-	req, err := http.NewRequest(http.MethodGet, url, nil)
+func httpGetWeather(url string) []byte {
+	resp, err := http.Get(url)
 	if err != nil {
 		log.Fatalf("The error occurs %v", err)
 	}
-	defer req.Body.Close()	
-	return json.NewDecoder(req.Body).Decode(target)
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatalf("The error occurs with reading JSON: %v", err)
+	}
+	return body
+}
+
+func readJSON (body []byte) СurrentWeather {
+	var data СurrentWeather
+	err := json.Unmarshal(body, &data)
+	if err != nil {
+		log.Fatalf("The data getting by GET HTTP request cannot be read to JSON: %v", err)
+	}
+	return data
 }
