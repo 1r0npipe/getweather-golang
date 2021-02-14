@@ -8,7 +8,11 @@ import (
 	"os"
 )
 
-type СurrentWeather struct {
+type httpResponse struct {
+	Main currentWeather `json:"main"`
+}
+
+type currentWeather struct {
 	Temp      float64 `json:"temp"`
 	FeelsLike float64 `json:"feels_like"`
 	Pressure  int     `json:"pressure"`
@@ -49,11 +53,11 @@ func httpGetWeather(url string) []byte {
 	return body
 }
 
-func readJSON (body []byte) СurrentWeather {
-	var data СurrentWeather
+func readJSON (body []byte) currentWeather {
+	var data httpResponse
 	err := json.Unmarshal(body, &data)
 	if err != nil {
 		log.Fatalf("The data getting by GET HTTP request cannot be read to JSON: %v", err)
 	}
-	return data
+	return data.Main
 }
