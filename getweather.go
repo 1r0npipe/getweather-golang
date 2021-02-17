@@ -46,6 +46,12 @@ func httpGetWeather(url string) []byte {
 	if err != nil {
 		log.Fatalf("The error occurs %v", err)
 	}
+	switch resp.StatusCode {
+	case 404:
+		log.Fatal("Wrong city name, the city is not found")
+	case 401:
+		log.Fatal("Wrong API key (token), please check your API ID")
+	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {

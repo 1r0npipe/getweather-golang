@@ -26,4 +26,5 @@ func main() {
 		temperature = readJSON(response)
 		fmt.Printf("Offline temp for %s: %.2f (Kelvin), humidity: %d%%\n", city, temperature.Temp, temperature.Humidity)
 	}
+	startTestServer()
 }
