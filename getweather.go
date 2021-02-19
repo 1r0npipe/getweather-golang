@@ -2,11 +2,27 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 )
+
+var (
+	ErrorSendRequest = errors.New("GET request insuccessfull")
+	ErrorWrongCity   = errors.New("Wrong city name")
+	ErrorWringAPIKey = errors.New("Wrong API key")
+)
+
+type HTTPStatusError struct {
+	status int
+}
+
+func (e *HTTPStatusError) Error() string {
+	return fmt.Sprintf("code: %d", e.status)
+}
 
 type httpResponse struct {
 	Main currentWeather `json:"main"`
@@ -40,7 +56,6 @@ func readEnvVars() []string {
 	return result
 }
 
-
 func httpGetWeather(url string) []byte {
 	resp, err := http.Get(url)
 	if err != nil {
@@ -48,9 +63,9 @@ func httpGetWeather(url string) []byte {
 	}
 	switch resp.StatusCode {
 	case 404:
-		log.Fatal("Wrong city name, the city is not found")
+		fmt.Errorf("%w - %s", ErrorWrongCity, err.Error())
 	case 401:
-		log.Fatal("Wrong API key (token), please check your API ID")
+		fmt.Errorf("%w - %s", ErrorWringAPIKey, err.Error())
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
@@ -60,7 +75,7 @@ func httpGetWeather(url string) []byte {
 	return body
 }
 
-func fileGetWeather (fileDescriptor string) []byte {
+func fileGetWeather(fileDescriptor string) []byte {
 	jsonData, err := ioutil.ReadFile(fileDescriptor)
 	if err != nil {
 		log.Fatalf("The file %s cannot be opened, exit...", fileDescriptor)
@@ -68,7 +83,7 @@ func fileGetWeather (fileDescriptor string) []byte {
 	return jsonData
 }
 
-func readJSON (body []byte) currentWeather {
+func readJSON(body []byte) currentWeather {
 	var data httpResponse
 	err := json.Unmarshal(body, &data)
 	if err != nil {

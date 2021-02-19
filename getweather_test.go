@@ -1,23 +1,23 @@
 package main
 
 import (
-	"reflect"
 	"testing"
+	"net/http"
 )
 
 func Test_httpGetWeather(t *testing.T) {
 	tests := []struct {
 		url string
-		codeRequest string
-		codeWant string
+		codeRequest int
+		codeWant int
 	}{
 		// it is planning to be a code got and want here like {404,404}
+		{"localhost:8080/success", 200, 200}, 
 	}
 	for _, tt := range tests {
-		t.Run(tt.url, func(t *testing.T) {
-			if got := httpGetWeather(tt.args.url); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("httpGetWeather() = %v, want %v", got, tt.want)
-			}
-		})
+		if resp, _ := http.Get(tt.url); resp.StatusCode != tt.codeWant {
+				t.Errorf("httpGetWeather() = %v, want %v", tt.codeRequest, tt.codeWant)
+		}
 	}
 }
+
