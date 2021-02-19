@@ -14,6 +14,7 @@ var (
 	ErrorSendRequest = errors.New("GET request insuccessfull")
 	ErrorWrongCity   = errors.New("Wrong city name")
 	ErrorWringAPIKey = errors.New("Wrong API key")
+	ErrorJsonParse   = errors.New("Can't parse JSON")
 )
 
 type HTTPStatusError struct {
@@ -87,7 +88,7 @@ func readJSON(body []byte) currentWeather {
 	var data httpResponse
 	err := json.Unmarshal(body, &data)
 	if err != nil {
-		log.Fatalf("The data getting by GET HTTP request cannot be read to JSON: %v", err)
+		log.Fatalf("The data getting by GET HTTP request cannot be read to JSON: %v", ErrorJsonParse)
 	}
 	return data.Main
 }
