@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 )
 
 func main() {
@@ -16,14 +17,26 @@ func main() {
 		city = *cityName
 	}
 	var url = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + token + "&units=" + unit
-	response := httpGetWeather(url)
-	temperature := readJSON(response)
+	response, err := httpGetWeather(url)
+	if err != nil {
+		log.Printf("Error %v", err)
+	}
+	temperature, err := readJSON(response)
+	if err != nil {
+		log.Printf("Error %v", err)
+	}
 	fmt.Printf("Online temp for %s: %.2f, humidity: %d%%\n", city, temperature.Temp, temperature.Humidity)
 	if *methodType == "offline" {
 		city = "Orenburg"
 		fmt.Println("Read data from Json file")
-		response = fileGetWeather(file)
-		temperature = readJSON(response)
+		response, err = fileGetWeather(file)
+		if err != nil {
+			log.Printf("Error %v", err)
+		}
+		temperature, err = readJSON(response)
+		if err != nil {
+			log.Printf("Error %v", err)
+		}
 		fmt.Printf("Offline temp for %s: %.2f (Kelvin), humidity: %d%%\n", city, temperature.Temp, temperature.Humidity)
 	}
 	startTestServer()

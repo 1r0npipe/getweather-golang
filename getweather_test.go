@@ -34,8 +34,8 @@ func Test_readJSON(t *testing.T) {
 		{"./data/weatherOffline.json", currentWeather{264.15, 256.0, 1018, 73}},
 	}
 	for _, tt := range tests {
-		response := fileGetWeather(tt.fileName)
-		temperature := readJSON(response)
+		response, _ := fileGetWeather(tt.fileName)
+		temperature, _ := readJSON(response)
 		if temperature != tt.want {
 			t.Errorf("The issue with input data, got %+v, want %+v", temperature, tt.want)
 		}

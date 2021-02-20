@@ -11,12 +11,19 @@ import (
 )
 
 var (
+	// ErrorSendRequest - Error if can't perform get
 	ErrorSendRequest = errors.New("GET request insuccessfull")
-	ErrorWrongCity   = errors.New("Wrong city name")
+	// ErrorWrongCity Error if wrong city name
+	ErrorWrongCity = errors.New("Wrong city name")
+	// ErrorWringAPIKey Error if wrong API key
 	ErrorWringAPIKey = errors.New("Wrong API key")
-	ErrorJsonParse   = errors.New("Can't parse JSON")
+	// ErrorJSONParse Error if can't perform parsing
+	ErrorJSONParse = errors.New("Can't parse JSON")
+	// ErrorReadFile  Error if can't pread a file
+	ErrorReadFile = errors.New("Can't read file")
 )
 
+// HTTPStatusError Server as stub
 type HTTPStatusError struct {
 	status int
 }
@@ -57,38 +64,38 @@ func readEnvVars() []string {
 	return result
 }
 
-func httpGetWeather(url string) []byte {
+func httpGetWeather(url string) ([]byte, error) {
 	resp, err := http.Get(url)
 	if err != nil {
-		log.Fatalf("The error occurs %v", err)
+		return nil, fmt.Errorf("%w - %s", ErrorSendRequest, err.Error())
 	}
 	switch resp.StatusCode {
 	case 404:
-		fmt.Errorf("%w - %s", ErrorWrongCity, err.Error())
+		return nil, fmt.Errorf("%w - %s", ErrorWrongCity, err.Error())
 	case 401:
-		fmt.Errorf("%w - %s", ErrorWringAPIKey, err.Error())
+		return nil, fmt.Errorf("%w - %s", ErrorWringAPIKey, err.Error())
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatalf("The error occurs with reading JSON: %v", err)
+		return nil, fmt.Errorf("The error occurs with reading file: %w - %s", ErrorReadFile, err.Error())
 	}
-	return body
+	return body, nil
 }
 
-func fileGetWeather(fileDescriptor string) []byte {
+func fileGetWeather(fileDescriptor string) ([]byte, error) {
 	jsonData, err := ioutil.ReadFile(fileDescriptor)
 	if err != nil {
-		log.Fatalf("The file %s cannot be opened, exit...", fileDescriptor)
+		return nil, fmt.Errorf("The file %s cannot be opened, info: %w - %s", ErrorReadFile, err.Error())
 	}
-	return jsonData
+	return jsonData, nil
 }
 
-func readJSON(body []byte) currentWeather {
+func readJSON(body []byte) (currentWeather, error) {
 	var data httpResponse
 	err := json.Unmarshal(body, &data)
 	if err != nil {
-		log.Fatalf("The data getting by GET HTTP request cannot be read to JSON: %v", ErrorJsonParse)
+		return currentWeather{}, fmt.Errorf("The data getting by GET HTTP request cannot be read to JSON: %w - %s", ErrorJSONParse, err.Error())
 	}
-	return data.Main
+	return data.Main, nil
 }
